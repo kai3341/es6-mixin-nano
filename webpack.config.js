@@ -1,12 +1,16 @@
-const path = require('path');
+import { dirname, join } from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 
-module.exports = {
+export default {
   mode: 'production',
   entry: './src/index.js',
 
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: join(__dirname, 'dist'),
     filename: 'bundle.js',
     library: {
       name: "ES6MixinNano",
@@ -19,9 +23,9 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: path.resolve(__dirname, 'src'),
-        options: {
-          presets: ["@babel/preset-env"],
+        include: join(__dirname, 'src'),
+        resolve: {
+          fullySpecified: false,
         },
       },
     ],
