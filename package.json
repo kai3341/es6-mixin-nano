@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "webpack --progress",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",

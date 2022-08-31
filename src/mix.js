@@ -1,10 +1,10 @@
 import injectMixin from "./injectMixin";
 
-export default function mix(BaseClass) {
+export default function mix(BaseClass /*, ...Mixins*/) {
   const Class = class extends BaseClass {};
-  for (const Mixin of arguments.slice(1-arguments.length)) {
-    injectMixin(Class, Mixin);
-  }
+  const Mixins = [...arguments].reverse();
+  Mixins.pop();
+  for (const Mixin of Mixins) injectMixin(Class, Mixin);
   return Class;
 }
 
