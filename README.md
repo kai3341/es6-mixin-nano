@@ -14,6 +14,28 @@ Limitations:
 * `super` in the mixin class does not work
 * No magic. Just copy attributes
 
+## Test coverage report
+
+| File           | % Stmts | % Branch | % Funcs | % Lines |
+|:---------------|--------:|---------:|--------:|--------:|
+| All files      |     100 |      100 |     100 |     100 |
+| index.js       |       0 |        0 |       0 |       0 |
+| injectMany.js  |     100 |      100 |     100 |     100 |
+| injectMixin.js |     100 |      100 |     100 |     100 |
+| mix.js         |     100 |      100 |     100 |     100 |
+| parentList.js  |     100 |      100 |     100 |     100 |
+
+## Size cost report
+
+Approximate cost of including `es6-mixin-nano` API:
+
+| Name               | Size (bytes) |
+|:-------------------|-------------:|
+| injectMany         |           79 |
+| injectMixin        |           74 |
+| mix                |           86 |
+| parentList         |           74 |
+
 ## API Reference
 
 ### mix
@@ -51,11 +73,30 @@ MyClass => FooMixin => BarMixin => BazMixin => Base
 It means if you define the same method in `FooMixin` and `BazMixin`, `MyClass`
 will have `FooMixin`'s implementation
 
+### injectMany
+
+Mid-level API, used by `mix`
+
+#### Importing
+
+```
+import { injectMany } from "es6-mixin-nano";
+```
+
+*OR*
+
+```
+import injectMany from "es6-mixin-nano/src/injectMany";
+```
+
+#### [Usage example](https://github.com/kai3341/es6-mixin-nano/blob/main/__tests__/injectMany.test.js)
+
+
 ### injectMixin
 
-Mid-level API, used by `mix`. Injects mixin behavior into target class in-place.
-Besides own given mixin's attributes injects into target class all attributes
-found in given mixin's parent classes
+Mid-level API, used by `injectMany`. Injects mixin behavior into target class
+in-place. Besides own given mixin's attributes injects into target class all
+attributes found in given mixin's parent classes
 
 #### Importing
 
