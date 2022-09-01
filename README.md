@@ -42,7 +42,6 @@ class My extends mix(Base, FooMixin, BarMixin, BazMixin) { /* --- */ }
 
 Mid-level API, used by `mix`. Injects mixin behavior into target class in-place.
 
-
 #### Importing
 
 ```
@@ -108,7 +107,10 @@ import parentList from "es6-mixin-nano/src/parentList";
 
 ## Similar packages and difference
 
-No one support mixins which are subclassed from parent class
+Both of them does not support mixins which are subclassed from parent class
+
+Both of them provide high-level API the same as my `mix` method, so by
+inspiration of them I've create it, test it, but never use it :)
 
 ### [es6-class-mixin](https://www.npmjs.com/package/es6-class-mixin)
 
@@ -117,13 +119,11 @@ functions and properties
 
 ### [mixin-es6](https://www.npmjs.com/package/mixin-es6)
 
-Nice one. By inspiration of this package I've implement the same high-level API,
-but I've never use it :) Dense, ignores [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle).
+Nice one, works fine with properties and static attributes and methods. Dense,
+ignores [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle).
 Unfortunally, the author did not check the build -- `webpack` generates weird and surprising
 code on [this](https://github.com/guiguan/mixin-es6/blob/master/src/index.js#L18) line:
 
 ```
 const mix = (BaseClass, ...Mixins) => {
 ```
-
-But in general it's nice idea
