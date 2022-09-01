@@ -32,7 +32,7 @@ import { mix } from "es6-mixin-nano";
 import mix from "es6-mixin-nano/src/mix";
 ```
 
-#### (Usage example)[https://github.com/kai3341/es6-mixin-nano/blob/main/__tests__/mix.test.js]
+#### [Usage example](https://github.com/kai3341/es6-mixin-nano/blob/main/__tests__/mix.test.js)
 
 ```
 class My extends mix(Base, FooMixin, BarMixin, BazMixin) { /* --- */ }
@@ -55,7 +55,7 @@ import { injectMixin } from "es6-mixin-nano";
 import injectMixin from "es6-mixin-nano/src/injectMixin";
 ```
 
-#### (Usage example)[https://github.com/kai3341/es6-mixin-nano/blob/main/__tests__/injectMixin.test.js]
+#### [Usage example](https://github.com/kai3341/es6-mixin-nano/blob/main/__tests__/injectMixin.test.js)
 
 ```
 class MapViaForOf {
@@ -102,7 +102,7 @@ import { parentList } from "es6-mixin-nano";
 import parentList from "es6-mixin-nano/src/parentList";
 ```
 
-#### (Usage example)[https://github.com/kai3341/es6-mixin-nano/blob/main/__tests__/parentList.test.js]
+#### [Usage example](https://github.com/kai3341/es6-mixin-nano/blob/main/__tests__/parentList.test.js)
 
 `// I'll publish the package which use this API`
 
@@ -110,13 +110,13 @@ import parentList from "es6-mixin-nano/src/parentList";
 
 No one support mixins which are subclassed from parent class
 
-### (es6-class-mixin)[https://www.npmjs.com/package/es6-class-mixin]
+### [es6-class-mixin](https://www.npmjs.com/package/es6-class-mixin)
 
 True minimal implementation, but does not support static class attributes /
 functions and properties
 
-### (mixin-es6)[https://www.npmjs.com/package/mixin-es6]
+### [mixin-es6](https://www.npmjs.com/package/mixin-es6)
 
 Nice one. By inspiration of this package I've implement the same high-level API,
-but I've never use it :) Dense, ignores (SRP)[https://en.wikipedia.org/wiki/Single-responsibility_principle]
+but I've never use it :) Dense, ignores [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle)
 
