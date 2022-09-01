@@ -118,5 +118,12 @@ functions and properties
 ### [mixin-es6](https://www.npmjs.com/package/mixin-es6)
 
 Nice one. By inspiration of this package I've implement the same high-level API,
-but I've never use it :) Dense, ignores [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle)
+but I've never use it :) Dense, ignores [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle).
+Unfortunally, the author did not check the build -- `webpack` generates weird and surprising
+code on [this](https://github.com/guiguan/mixin-es6/blob/master/src/index.js#L18) line:
 
+```
+const mix = (BaseClass, ...Mixins) => {
+```
+
+But in general it's nice idea
