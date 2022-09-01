@@ -18,7 +18,11 @@ Limitations:
 
 ### mix
 
-High-level API
+High-level API. Works the same as `mixin` of [es6-class-mixin](https://www.npmjs.com/package/es6-class-mixin)
+and `mix` of [mixin-es6](https://www.npmjs.com/package/mixin-es6). Look there
+for more examples
+
+Difference is in method resolve order, explaination is in example
 
 #### Importing
 
@@ -35,12 +39,23 @@ import mix from "es6-mixin-nano/src/mix";
 #### [Usage example](https://github.com/kai3341/es6-mixin-nano/blob/main/__tests__/mix.test.js)
 
 ```
-class My extends mix(Base, FooMixin, BarMixin, BazMixin) { /* --- */ }
+class MyClass extends mix(Base, FooMixin, BarMixin, BazMixin) { /* --- */ }
 ```
+
+Method resolve order:
+
+```
+MyClass => FooMixin => BarMixin => BazMixin => Base
+```
+
+It means if you define the same method in `FooMixin` and `BazMixin`, `MyClass`
+will have `FooMixin`'s implementation
 
 ### injectMixin
 
 Mid-level API, used by `mix`. Injects mixin behavior into target class in-place.
+Besides own given mixin's attributes injects into target class all attributes
+found in given mixin's parent classes
 
 #### Importing
 
@@ -107,7 +122,8 @@ import parentList from "es6-mixin-nano/src/parentList";
 
 ## Similar packages and difference
 
-Both of them does not support mixins which are subclassed from parent class
+Both of them does not handle correctly mixins which are subclassed
+from parent class
 
 Both of them provide high-level API the same as my `mix` method, so by
 inspiration of them I've create it, test it, but never use it :)
