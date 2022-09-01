@@ -1,10 +1,10 @@
-import { FooAble, BarAble, BazAble } from "./mixinClasses";
+import { FooAble, FuzzAble, BarAble, BazAble } from "./mixinClasses";
 
 const propertyChecks = [42, "123", [], {}];
 
 // ===
 
-export function testFooAble(T, t) {
+function baseTestFooAble(T, t) {
   for (const checkValue of propertyChecks) {
     t.fooPreperty = checkValue;
     expect(t.fooPreperty).toEqual(checkValue);
@@ -12,7 +12,6 @@ export function testFooAble(T, t) {
   }
 
   expect(typeof t.fooFunc).toEqual("function");
-  expect(t.fooFunc).toEqual(FooAble.prototype.fooFunc);
 
   expect(typeof T.fooStaticFunc).toEqual("function");
   expect(typeof t.constructor.fooStaticFunc).toEqual("function");
@@ -21,9 +20,32 @@ export function testFooAble(T, t) {
   expect(typeof T.fooStaticArrowFunc).toEqual("function");
   expect(typeof t.constructor.fooStaticArrowFunc).toEqual("function");
   expect(t.constructor.fooStaticArrowFunc).toEqual(T.fooStaticArrowFunc);
+}
+
+// ===
+
+export function testFooAble(T, t) {
+  baseTestFooAble(T, t)
+
+  expect(t.fooFunc).toEqual(FooAble.prototype.fooFunc);
 
   expect(T.fooStaticAttr).toEqual(FooAble.fooStaticAttr);
   expect(t.constructor.fooStaticAttr).toEqual(FooAble.fooStaticAttr);
+}
+
+
+// ===
+
+export function testFuzzAble(T, t) {
+  baseTestFooAble(T, t)
+
+  expect(t.fooFunc).toEqual(FuzzAble.prototype.fooFunc);
+
+  expect(typeof t.fuzzFunc).toEqual("function");
+  expect(t.fuzzFunc).toEqual(FuzzAble.prototype.fuzzFunc);
+
+  expect(T.fooStaticAttr).toEqual(FuzzAble.fooStaticAttr);
+  expect(t.constructor.fooStaticAttr).toEqual(FuzzAble.fooStaticAttr);
 }
 
 // ===
@@ -68,3 +90,4 @@ export function testBazAble(T, t) {
   expect(T.barStaticAttr).toEqual(BazAble.barStaticAttr);
   expect(t.constructor.barStaticAttr).toEqual(BazAble.barStaticAttr);
 }
+

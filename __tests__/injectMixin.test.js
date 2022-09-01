@@ -1,7 +1,18 @@
 import injectMixin from "../src/injectMixin";
 
-import { FooAble, BarAble, BazAble } from "../__tests_lib__/mixinClasses";
-import { testFooAble, testBarAble, testBazAble } from "../__tests_lib__/testMixinClass";
+import {
+  FooAble,
+  FuzzAble,
+  BarAble,
+  BazAble,
+} from "../__tests_lib__/mixinClasses";
+
+import {
+  testFooAble,
+  testFuzzAble,
+  testBarAble,
+  testBazAble,
+} from "../__tests_lib__/testMixinClass";
 
 
 describe("injectMixin", () => {
@@ -48,6 +59,16 @@ describe("injectMixin", () => {
     const t = new T();
 
     testFooAble(T, t);
+    testBazAble(T, t);
+  });
+
+  test("FuzzBazAble", () => {
+    const T = class {};
+    injectMixin(T, FuzzAble);
+    injectMixin(T, BazAble);
+    const t = new T();
+
+    testFuzzAble(T, t);
     testBazAble(T, t);
   });
 });

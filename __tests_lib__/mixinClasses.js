@@ -8,6 +8,13 @@ export class FooAble {
 }
 
 
+export class FuzzAble extends FooAble {
+  fooFunc() {}
+  fuzzFunc() {}
+  static fooStaticAttr = "fuzzAttribute"
+}
+
+
 export class BarAble {
   barFunc() {}
   get barPreperty() { return this._barPrepertyValue }
