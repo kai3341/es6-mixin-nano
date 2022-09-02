@@ -5,6 +5,10 @@ As minimal as possible modular class mixin / polyfill utility. Size report is at
 the bottom of this document at the [reports](#reports) section, just roll down.
 You can include only required to you part of this library into your application
 
+What about performance. Runtime overhead is zero. Library code executes only
+once on application startup (normally. But you may to create classes
+(not instances, exactly classes) in the runtime) and looks has no place to stuck
+
 Works fine:
 * `static` methods and attributes
 * properties
