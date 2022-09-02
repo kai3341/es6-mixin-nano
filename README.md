@@ -2,7 +2,8 @@
 ES6 Mixin support
 
 As minimal as possible modular class mixin / polyfill utility. Size report is at
-the bottom of this document at the [reports](#reports) section, just roll down
+the bottom of this document at the [reports](#reports) section, just roll down.
+You can include only required to you part of this library into your application
 
 Works fine:
 * `static` methods and attributes
@@ -55,7 +56,7 @@ will have `FooMixin`'s implementation
 ### injectMany
 
 Mid-level API, used by `mix`. `injectMany` handles method resolve order and
-uses `injectMixin` as worker
+uses `injectMixin` as worker. Injects mixins into the target class in-place
 
 #### Importing
 
@@ -172,7 +173,8 @@ from parent class
 Both of them provide high-level API the same as my `mix` method, so by
 inspiration of them I've create it, test it, but never use it :)
 
-Both of them are dense and ignore [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle)
+Both of them are dense and ignore [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle).
+It means you can't use only part of their's functionality -- all or nothing
 
 
 ### [es6-class-mixin](https://www.npmjs.com/package/es6-class-mixin)
@@ -199,7 +201,9 @@ Nice one, works fine with properties and static attributes and methods
 
 ### Size cost report
 
-Approximate cost of including `es6-mixin-nano` into your application bundle:
+Approximate cost of including `es6-mixin-nano` into your application bundle. You
+may view full report via running `npm run sizereport`. Keep in mind I did not
+extract full module code and check only exported function source code size
 
 | Name        | Size (bytes) |
 |:------------|-------------:|

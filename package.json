@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "webpack --progress",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "sizereport": "npm run build && node calc_compiled_size.js"
   },
   "repository": {
     "type": "git",
