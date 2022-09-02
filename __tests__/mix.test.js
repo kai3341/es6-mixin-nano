@@ -17,7 +17,7 @@ import {
 
 describe("mix", () => {
   test("FooAble", () => {
-    const T = class extends mix(FooAble) {};
+    const T = class extends mix(FooAble) { };
     const t = new T();
 
     testFooAble(T, t);
@@ -25,7 +25,7 @@ describe("mix", () => {
 
 
   test("BarAble", () => {
-    const T = class extends mix(BarAble) {};
+    const T = class extends mix(BarAble) { };
     const t = new T();
 
     testBarAble(T, t);
@@ -33,7 +33,7 @@ describe("mix", () => {
 
 
   test("FooBarAble", () => {
-    const T = class extends mix(FooAble, BarAble) {};
+    const T = class extends mix(FooAble, BarAble) { };
     const t = new T();
 
     testFooAble(T, t);
@@ -41,14 +41,14 @@ describe("mix", () => {
   });
 
   test("BazAble", () => {
-    const T = class extends mix(BazAble) {};
+    const T = class extends mix(BazAble) { };
     const t = new T();
 
     testBazAble(T, t);
   });
 
   test("FooBazAble", () => {
-    const T = class extends mix(FooAble, BazAble) {};
+    const T = class extends mix(FooAble, BazAble) { };
     const t = new T();
 
     testFooAble(T, t);
@@ -56,11 +56,10 @@ describe("mix", () => {
   });
 
   test("FuzzBazAble", () => {
-    const T = class extends mix(FuzzAble, BazAble) {};
+    const T = class extends mix(FuzzAble, BazAble) { };
     const t = new T();
 
     testFuzzAble(T, t);
     testBazAble(T, t);
   });
 });
-

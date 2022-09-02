@@ -4,4 +4,3 @@ export default {
     '\\.[jt]sx?$': ['babel-jest', { rootMode: 'upward' }],
   },
 };
-

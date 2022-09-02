@@ -1,4 +1,5 @@
 # es6-mixin-nano
+
 ES6 Mixin support
 
 As minimal as possible modular class mixin / polyfill utility. Size report is at
@@ -10,15 +11,17 @@ once on application startup (normally. But you may to create classes
 (not instances, exactly classes) in the runtime) and looks has no place to stuck
 
 Works fine:
-* `static` methods and attributes
-* properties
-* regular methods
+
+- `static` methods and attributes
+- properties
+- regular methods
 
 Limitations:
-* Instance attributes does not work
-* Arrow function methods does not work
-* `super` in the mixin class does not work
-* No magic. Just copy attributes
+
+- Instance attributes does not work
+- Arrow function methods does not work
+- `super` in the mixin class does not work
+- No magic. Just copy attributes
 
 ## API Reference
 
@@ -36,7 +39,7 @@ Difference is in method resolve order, explaination is in example
 import { mix } from "es6-mixin-nano";
 ```
 
-*OR*
+_OR_
 
 ```
 import mix from "es6-mixin-nano/src/mix";
@@ -68,7 +71,7 @@ uses `injectMixin` as worker. Injects mixins into the target class in-place
 import { injectMany } from "es6-mixin-nano";
 ```
 
-*OR*
+_OR_
 
 ```
 import injectMany from "es6-mixin-nano/src/injectMany";
@@ -99,7 +102,7 @@ given mixin's parent classes
 import { injectMixin } from "es6-mixin-nano";
 ```
 
-*OR*
+_OR_
 
 ```
 import injectMixin from "es6-mixin-nano/src/injectMixin";
@@ -146,7 +149,7 @@ Low-level introspection API. Returns `Array` of parent classes including given
 import { parentList } from "es6-mixin-nano";
 ```
 
-*OR*
+_OR_
 
 ```
 import parentList from "es6-mixin-nano/src/parentList";
@@ -181,7 +184,6 @@ Both of them are dense and ignore
 [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle).
 It means you can't use only part of their's functionality -- all or nothing
 
-
 ### [es6-class-mixin](https://www.npmjs.com/package/es6-class-mixin)
 
 True minimal implementation, but does not support static class attributes /
@@ -196,7 +198,7 @@ Nice one, works fine with properties and static attributes and methods
 ### Test coverage report
 
 | File           | % Stmts | % Branch | % Funcs | % Lines |
-|:---------------|--------:|---------:|--------:|--------:|
+| :------------- | ------: | -------: | ------: | ------: |
 | All files      |     100 |      100 |     100 |     100 |
 | index.js       |       0 |        0 |       0 |       0 |
 | injectMany.js  |     100 |      100 |     100 |     100 |
@@ -211,9 +213,8 @@ may view full report via running `npm run sizereport`. Keep in mind I did not
 extract full module code and check only exported function source code size
 
 | API Name    | Size (bytes) |
-|-------------|-------------:|
+| ----------- | -----------: |
 | injectMany  |           53 |
 | injectMixin |           74 |
 | mix         |           80 |
 | parentList  |           74 |
-

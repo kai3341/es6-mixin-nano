@@ -11,7 +11,7 @@ class WrapString {
     this.wrap = this[align];
   }
 
-  wrap(str) { /* replaces by left/right/center */}
+  wrap(str) { /* replaces by left/right/center */ }
 
   left(str) {
     const rest = this.len - str.length - 1;
@@ -57,7 +57,7 @@ class MarkdownTable {
 
       const cfg = this.rowConfigIndex[key];
 
-      if(!cfg) continue;
+      if (!cfg) continue;
 
       const valueLength = valueStr.length + 2;
       cfg.$wrapString.len = Math.max(cfg.$wrapString.len, valueLength);
@@ -102,10 +102,10 @@ class MarkdownTable {
   }
 
   static renderDelimiterSettings = {
-    [undefined]:  [0b00, 0],
-    left:         [0b10, 1],
-    right:        [0b01, 1],
-    center:       [0b11, 2],
+    [undefined]: [0b00, 0],
+    left: [0b10, 1],
+    right: [0b01, 1],
+    center: [0b11, 2],
   }
 
   renderDelimiter() {
@@ -114,7 +114,7 @@ class MarkdownTable {
 
     for (const { key, $wrapString, align } of this.rowConfig) {
       const len = $wrapString.len;
-      const [ alignCode, alignLength ] = renderDelimiterSettings[align];
+      const [alignCode, alignLength] = renderDelimiterSettings[align];
 
       const dashCount = len - alignLength;
 
@@ -134,25 +134,24 @@ const self = {};
 global.self = self;
 
 import("./dist/bundle.js")
-.then(bundle => {
-  const { ES6MixinNano } = self;
-  const ES6MixinNanoDesciptors = Object.getOwnPropertyDescriptors(ES6MixinNano);
-  delete ES6MixinNanoDesciptors["__esModule"];
+  .then(bundle => {
+    const { ES6MixinNano } = self;
+    const ES6MixinNanoDesciptors = Object.getOwnPropertyDescriptors(ES6MixinNano);
+    delete ES6MixinNanoDesciptors["__esModule"];
 
-  const mdReport = new MarkdownTable(
-    { key: "name", head: "API Name" },
-    { key: "bytes", head: "Size (bytes)", align: "right" },
-    { key: "source", head: "Source Code" },
-  )
+    const mdReport = new MarkdownTable(
+      { key: "name", head: "API Name" },
+      { key: "bytes", head: "Size (bytes)", align: "right" },
+      { key: "source", head: "Source Code" },
+    )
 
-  for (const [name, value] of Object.entries(ES6MixinNanoDesciptors)) {
-    const compiled = value.get();
-    const source = compiled.toString();
-    const bytes = source.length;
-    mdReport.row({ name, bytes, source });
-  }
+    for (const [name, value] of Object.entries(ES6MixinNanoDesciptors)) {
+      const compiled = value.get();
+      const source = compiled.toString();
+      const bytes = source.length;
+      mdReport.row({ name, bytes, source });
+    }
 
-  console.log(mdReport.render());
-})
-.catch((e) => console.error("Run `npm run build` first!", e))
-
+    console.log(mdReport.render());
+  })
+  .catch((e) => console.error("Run `npm run build` first!", e))

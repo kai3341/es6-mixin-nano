@@ -1,9 +1,9 @@
 import parentList from "../src/parentList";
 
-class A {};
-class B extends A {};
-class C extends B {};
-class D extends C {};
+class A { };
+class B extends A { };
+class C extends B { };
+class D extends C { };
 
 describe("parentList", () => {
   test("class A", () => {
@@ -22,4 +22,3 @@ describe("parentList", () => {
     expect(parentList(D)).toEqual([A, B, C, D]);
   });
 });
-

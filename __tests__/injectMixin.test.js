@@ -17,7 +17,7 @@ import {
 
 describe("injectMixin", () => {
   test("FooAble", () => {
-    const T = class {};
+    const T = class { };
     injectMixin(T, FooAble);
     const t = new T();
 
@@ -26,7 +26,7 @@ describe("injectMixin", () => {
 
 
   test("BarAble", () => {
-    const T = class {};
+    const T = class { };
     injectMixin(T, BarAble);
     const t = new T();
 
@@ -35,7 +35,7 @@ describe("injectMixin", () => {
 
 
   test("FooBarAble", () => {
-    const T = class {};
+    const T = class { };
     injectMixin(T, FooAble);
     injectMixin(T, BarAble);
     const t = new T();
@@ -45,7 +45,7 @@ describe("injectMixin", () => {
   });
 
   test("BazAble", () => {
-    const T = class {};
+    const T = class { };
     injectMixin(T, BazAble);
     const t = new T();
 
@@ -53,7 +53,7 @@ describe("injectMixin", () => {
   });
 
   test("FooBazAble", () => {
-    const T = class {};
+    const T = class { };
     injectMixin(T, FooAble);
     injectMixin(T, BazAble);
     const t = new T();
@@ -63,7 +63,7 @@ describe("injectMixin", () => {
   });
 
   test("FuzzBazAble", () => {
-    const T = class {};
+    const T = class { };
     injectMixin(T, FuzzAble);
     injectMixin(T, BazAble);
     const t = new T();
@@ -72,4 +72,3 @@ describe("injectMixin", () => {
     testBazAble(T, t);
   });
 });
-

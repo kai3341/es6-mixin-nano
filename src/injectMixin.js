@@ -17,4 +17,3 @@ export default function injectMixin(BaseClass, MixinWithParents) {
     applyMixin(BaseClass, Mixin, staticBlacklist);
   }
 }
-

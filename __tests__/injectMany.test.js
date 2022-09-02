@@ -17,7 +17,7 @@ import {
 
 describe("injectMany", () => {
   test("FooAble", () => {
-    const T = class {};
+    const T = class { };
     injectMany(T, FooAble);
     const t = new T();
 
@@ -25,7 +25,7 @@ describe("injectMany", () => {
   });
 
   test("FooBarAble", () => {
-    const T = class {};
+    const T = class { };
     injectMany(T, FooAble, BarAble);
     const t = new T();
 
@@ -34,7 +34,7 @@ describe("injectMany", () => {
   });
 
   test("BazAble", () => {
-    const T = class {};
+    const T = class { };
     injectMany(T, BazAble);
     const t = new T();
 
@@ -42,7 +42,7 @@ describe("injectMany", () => {
   });
 
   test("FooBazAble", () => {
-    const T = class {};
+    const T = class { };
     injectMany(T, FooAble, BazAble);
     const t = new T();
 
@@ -51,7 +51,7 @@ describe("injectMany", () => {
   });
 
   test("FuzzBazAble", () => {
-    const T = class {};
+    const T = class { };
     injectMany(T, FuzzAble, BazAble);
     const t = new T();
 
@@ -59,4 +59,3 @@ describe("injectMany", () => {
     testBazAble(T, t);
   });
 });
-
