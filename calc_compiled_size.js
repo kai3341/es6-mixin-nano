@@ -23,6 +23,22 @@ class WrapString {
     result.push(this.str, " ");
     return result.join("");
   }
+
+  center() {
+    const result = [this.str];
+    let rest = this.len - this.str.length;
+    const restOdd = rest % 2;
+    rest = (rest - restOdd) / 2;
+
+    for (let i=0; i<rest; i++) {
+      result.push(" ");
+      result.unshift(" ");
+    }
+
+    if (restOdd) result.push(" ");
+
+    return result.join("");
+  }
 }
 
 
@@ -30,37 +46,67 @@ class MarkdownTable {
   constructor(/*{ key, head, len, align }, ...*/) {
     this.report = [];
     this.rowConfig = arguments;
-    this.head();
+
+    this.rowConfigIndex = {};
+    for (const item of arguments) {
+      if (!item.hasOwnProperty("len")) item.len = 0;
+      this.rowConfigIndex[item.key] = item;
+    }
   }
 
-  head() {
-    const obj = {};
+  updateConfig(row) {
+    for (const [key, value] of Object.entries(row)) {
+      const valueStr = value.toString();
+      row[key] = valueStr;
 
-    for (const { key, head } of this.rowConfig) obj[key] = head;
+      const cfg = this.rowConfigIndex[key];
 
-    this.row(obj);
-    this.delimiter();
+      if(!cfg) continue;
+
+      const valueStrLength = valueStr.length + 2;
+      if (cfg.len < valueStrLength) cfg.len = valueStrLength;
+    }
+  }
+
+  row(row) {
+    this.updateConfig(row);
+    this.report.push(row);
   }
 
   render() {
-    return this.report.join("\n");
+    const headerRow = this.headerRow();
+    this.updateConfig(headerRow);
+
+    const result = this.report.map(this.renderRow);
+
+    result.unshift(this.renderDelimiter());
+    result.unshift(this.renderRow(headerRow));
+    return result.join("\n");
   }
 
-  row(obj) {
+  headerRow() {
+    const row = {};
+
+    for (const { key, head } of this.rowConfig) row[key] = head;
+
+    return row;
+  }
+
+  renderRow = (row) => {
     const result = ["|"];
 
     for (const { key, len, align } of this.rowConfig) {
-      const value = obj[key] || " ";
+      const value = row[key] || " ";
       const wrapper = new WrapString(value, len);
       const wrapped = wrapper.align(align);
       result.push(wrapped);
       result.push("|");
     }
 
-    this.report.push(result.join(""));
+    return result.join("");
   }
 
-  delimiter() {
+  renderDelimiter() {
     const result = ["|"];
 
     for (const { key, len, align } of this.rowConfig) {
@@ -74,7 +120,7 @@ class MarkdownTable {
       result.push("|");
     }
 
-    this.report.push(result.join(""));
+    return result.join("");
   }
 }
 
@@ -88,18 +134,19 @@ import("./dist/bundle.js")
   delete ES6MixinNanoDesciptors["__esModule"];
 
   const mdReport = new MarkdownTable(
-    { key: "name", head: "Name", len: 20, align: "left"},
-    { key: "bytes", head: "Size (bytes)", len: 14, align: "right" },
+    { key: "name", head: "Name", align: "left"},
+    { key: "bytes", head: "Size (bytes)", align: "right" },
+    { key: "source", head: "Source Code", align: "left" },
   )
 
   for (const [name, value] of Object.entries(ES6MixinNanoDesciptors)) {
     const compiled = value.get();
     const source = compiled.toString();
     const bytes = source.length;
-    mdReport.row({ name, bytes });
+    mdReport.row({ name, source, bytes });
   }
 
   console.log(mdReport.render());
 })
-.catch(console.error)
+.catch(() => console.error("Run `npm run build` first!"))
 

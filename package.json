@@ -16,6 +16,7 @@
     "class",
     "OOP",
     "mixin",
+    "polyfill",
     "ES6",
     "inheritance"
   ],
@@ -33,6 +34,8 @@
     "webpack-cli": "^4.10.0"
   },
   "browserslist": [
-    "last 10 versions, not dead"
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
   ]
 }
