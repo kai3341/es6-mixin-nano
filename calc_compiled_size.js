@@ -28,11 +28,7 @@ class WrapString {
   center(str) {
     const rest = this.len - str.length;
     const isEven = rest % 2;
-
-    const before = isEven
-    ? (rest - 1) / 2
-    : rest / 2;
-
+    const before = (rest - isEven) / 2;
     const after = before + isEven;
 
     const result = [" ".repeat(before), str, " ".repeat(after)];
@@ -64,7 +60,7 @@ class MarkdownTable {
       if(!cfg) continue;
 
       const valueLength = valueStr.length + 2;
-      if (cfg.$wrapString.len < valueLength) cfg.$wrapString.len = valueLength;
+      cfg.$wrapString.len = Math.max(cfg.$wrapString.len, valueLength);
     }
   }
 
@@ -107,8 +103,8 @@ class MarkdownTable {
 
   static renderDelimiterSettings = {
     [undefined]:  [0b00, 0],
-    right:        [0b10, 1],
-    left:         [0b01, 1],
+    left:         [0b10, 1],
+    right:        [0b01, 1],
     center:       [0b11, 2],
   }
 
@@ -153,7 +149,7 @@ import("./dist/bundle.js")
     const compiled = value.get();
     const source = compiled.toString();
     const bytes = source.length;
-    mdReport.row({ name, source, bytes });
+    mdReport.row({ name, bytes, source });
   }
 
   console.log(mdReport.render());
