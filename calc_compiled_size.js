@@ -1,41 +1,59 @@
+/*
+This module is a good example how to create a library while you are publishing
+your another library
+*/
+
+
 class WrapString {
-  constructor(str, len) {
-    this.str = str.toString();
+  constructor(len, align = "left") {
     this.len = len;
+    this.align = align;
+    this.wrap = this[align];
   }
 
-  align(_align) {
-    const alignMethod = this[_align];
-    return alignMethod.call(this);
-  }
+  wrap(str) { /* replaces by left/right/center */}
 
-  left() {
-    const result = [" ", this.str];
-    const rest = this.len - this.str.length - 1;
-    for (let i=0; i<rest; i++) result.push(" ");
+  left(str) {
+    const rest = this.len - str.length - 1;
+
+    const result = [
+      " ",
+      str,
+      " ".repeat(rest),
+    ];
+
     return result.join("");
   }
 
-  right() {
-    const result = [];
-    const rest = this.len - this.str.length - 1;
-    for (let i=0; i<rest; i++) result.push(" ");
-    result.push(this.str, " ");
+  right(str) {
+    const rest = this.len - str.length - 1;
+
+    const result = [
+      " ".repeat(rest),
+      str,
+      " ",
+    ];
+
     return result.join("");
   }
 
-  center() {
-    const result = [this.str];
-    let rest = this.len - this.str.length;
-    const restOdd = rest % 2;
-    rest = (rest - restOdd) / 2;
+  center(str) {
+    const rest = this.len - str.length;
+    const isEven = rest % 2;
 
-    for (let i=0; i<rest; i++) {
-      result.push(" ");
-      result.unshift(" ");
-    }
+    const before = isEven
+    ? (rest - 1) / 2
+    : rest / 2;
 
-    if (restOdd) result.push(" ");
+    const after = isEven
+    ? before + 1
+    : before;
+
+    const result = [
+      " ".repeat(before),
+      str,
+      " ".repeat(after),
+    ];
 
     return result.join("");
   }
@@ -49,7 +67,10 @@ class MarkdownTable {
 
     this.rowConfigIndex = {};
     for (const item of arguments) {
-      if (!item.hasOwnProperty("len")) item.len = 0;
+      const itemLen = item.hasOwnProperty("len")
+      ? item.len
+      : 0;
+      item.$wrapString = new WrapString(itemLen, item.align);
       this.rowConfigIndex[item.key] = item;
     }
   }
@@ -63,8 +84,8 @@ class MarkdownTable {
 
       if(!cfg) continue;
 
-      const valueStrLength = valueStr.length + 2;
-      if (cfg.len < valueStrLength) cfg.len = valueStrLength;
+      const valueLength = valueStr.length + 2;
+      if (cfg.$wrapString.len < valueLength) cfg.$wrapString.len = valueLength;
     }
   }
 
@@ -95,10 +116,9 @@ class MarkdownTable {
   renderRow = (row) => {
     const result = ["|"];
 
-    for (const { key, len, align } of this.rowConfig) {
+    for (const { key, align, $wrapString } of this.rowConfig) {
       const value = row[key] || " ";
-      const wrapper = new WrapString(value, len);
-      const wrapped = wrapper.align(align);
+      const wrapped = $wrapString.wrap(value);
       result.push(wrapped);
       result.push("|");
     }
@@ -109,14 +129,18 @@ class MarkdownTable {
   renderDelimiter() {
     const result = ["|"];
 
-    for (const { key, len, align } of this.rowConfig) {
-      const dashCount = (align === "center")
-      ? len - 2
-      : len - 1
+    for (const { key, $wrapString, align } of this.rowConfig) {
+      const len = $wrapString.len;
 
-      if (align !== "right") result.push(":");
-      for (let i=0; i<dashCount; i++) result.push("-");
-      if (align !== "left") result.push(":");
+      const dashCount = align
+      ? (align === "center")
+        ? len - 2
+        : len - 1
+      : len;
+
+      if (align && align !== "right") result.push(":");
+      result.push("-".repeat(dashCount));
+      if (align && align !== "left") result.push(":");
       result.push("|");
     }
 
@@ -134,9 +158,9 @@ import("./dist/bundle.js")
   delete ES6MixinNanoDesciptors["__esModule"];
 
   const mdReport = new MarkdownTable(
-    { key: "name", head: "Name", align: "left"},
+    { key: "name", head: "Name" },
     { key: "bytes", head: "Size (bytes)", align: "right" },
-    { key: "source", head: "Source Code", align: "left" },
+    { key: "source", head: "Source Code" },
   )
 
   for (const [name, value] of Object.entries(ES6MixinNanoDesciptors)) {
@@ -148,5 +172,5 @@ import("./dist/bundle.js")
 
   console.log(mdReport.render());
 })
-.catch(() => console.error("Run `npm run build` first!"))
+.catch((e) => console.error("Run `npm run build` first!", e))
 

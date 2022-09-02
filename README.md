@@ -173,7 +173,8 @@ from parent class
 Both of them provide high-level API the same as my `mix` method, so by
 inspiration of them I've create it, test it, but never use it :)
 
-Both of them are dense and ignore [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle).
+Both of them are dense and ignore
+[SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle).
 It means you can't use only part of their's functionality -- all or nothing
 
 
@@ -206,7 +207,7 @@ may view full report via running `npm run sizereport`. Keep in mind I did not
 extract full module code and check only exported function source code size
 
 | Name        | Size (bytes) |
-|:------------|-------------:|
+|-------------|-------------:|
 | injectMany  |           53 |
 | injectMixin |           74 |
 | mix         |           80 |
