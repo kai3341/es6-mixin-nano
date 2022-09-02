@@ -206,7 +206,7 @@ Approximate cost of including `es6-mixin-nano` into your application bundle. You
 may view full report via running `npm run sizereport`. Keep in mind I did not
 extract full module code and check only exported function source code size
 
-| Name        | Size (bytes) |
+| API Name    | Size (bytes) |
 |-------------|-------------:|
 | injectMany  |           53 |
 | injectMixin |           74 |

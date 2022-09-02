@@ -15,25 +15,13 @@ class WrapString {
 
   left(str) {
     const rest = this.len - str.length - 1;
-
-    const result = [
-      " ",
-      str,
-      " ".repeat(rest),
-    ];
-
+    const result = [" ", str, " ".repeat(rest)];
     return result.join("");
   }
 
   right(str) {
     const rest = this.len - str.length - 1;
-
-    const result = [
-      " ".repeat(rest),
-      str,
-      " ",
-    ];
-
+    const result = [" ".repeat(rest), str, " "];
     return result.join("");
   }
 
@@ -45,16 +33,9 @@ class WrapString {
     ? (rest - 1) / 2
     : rest / 2;
 
-    const after = isEven
-    ? before + 1
-    : before;
+    const after = before + isEven;
 
-    const result = [
-      " ".repeat(before),
-      str,
-      " ".repeat(after),
-    ];
-
+    const result = [" ".repeat(before), str, " ".repeat(after)];
     return result.join("");
   }
 }
@@ -67,9 +48,7 @@ class MarkdownTable {
 
     this.rowConfigIndex = {};
     for (const item of arguments) {
-      const itemLen = item.hasOwnProperty("len")
-      ? item.len
-      : 0;
+      const itemLen = item.len || 0;
       item.$wrapString = new WrapString(itemLen, item.align);
       this.rowConfigIndex[item.key] = item;
     }
@@ -126,27 +105,34 @@ class MarkdownTable {
     return result.join("");
   }
 
+  static renderDelimiterSettings = {
+    [undefined]:  [0b00, 0],
+    right:        [0b10, 1],
+    left:         [0b01, 1],
+    center:       [0b11, 2],
+  }
+
   renderDelimiter() {
+    const { renderDelimiterSettings } = this.constructor;
     const result = ["|"];
 
     for (const { key, $wrapString, align } of this.rowConfig) {
       const len = $wrapString.len;
+      const [ alignCode, alignLength ] = renderDelimiterSettings[align];
 
-      const dashCount = align
-      ? (align === "center")
-        ? len - 2
-        : len - 1
-      : len;
+      const dashCount = len - alignLength;
 
-      if (align && align !== "right") result.push(":");
+      if (alignCode & 0b10) result.push(":");
       result.push("-".repeat(dashCount));
-      if (align && align !== "left") result.push(":");
+      if (alignCode & 0b01) result.push(":");
       result.push("|");
     }
 
     return result.join("");
   }
 }
+
+// -----------------------------------------------------------------------------
 
 const self = {};
 global.self = self;
@@ -158,7 +144,7 @@ import("./dist/bundle.js")
   delete ES6MixinNanoDesciptors["__esModule"];
 
   const mdReport = new MarkdownTable(
-    { key: "name", head: "Name" },
+    { key: "name", head: "API Name" },
     { key: "bytes", head: "Size (bytes)", align: "right" },
     { key: "source", head: "Source Code" },
   )
