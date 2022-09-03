@@ -9,8 +9,9 @@ class ColumnRendererDefault {
     alignDelimiters: true,
     delimiterDash: "-",
     alignDelimiter: ":",
+    alignCenterLeft: 1,
     space: " ",
-    len: 0,
+    len: 2,
   };
 
   static delimiters = ({ delimiterDash }) => [delimiterDash, delimiterDash];
@@ -27,11 +28,12 @@ class ColumnRendererDefault {
   }
 
   renderDelimiter() {
+    const [start, end] = this.delimiters;
     const centralDashCount = this.alignDelimiters
       ? this.len - 2
       : this.constructor.hasCentralDash;
 
-    return this.delimiters[0] + this.delimiterDash.repeat(centralDashCount) + this.delimiters[1];
+    return start + this.delimiterDash.repeat(centralDashCount) + end;
   }
 
   renderTitle() {
@@ -44,11 +46,15 @@ class ColumnRendererDefault {
 }
 
 class ColumnRendererLeft extends ColumnRendererDefault {
-  static delimiters = ({ delimiterDash, alignDelimiter }) => [alignDelimiter, delimiterDash];
+  static delimiters = ({ delimiterDash, alignDelimiter }) => (
+    [alignDelimiter, delimiterDash]
+  );
 }
 
 class ColumnRendererRight extends ColumnRendererDefault {
-  static delimiters = ({ delimiterDash, alignDelimiter }) => [delimiterDash, alignDelimiter];
+  static delimiters = ({ delimiterDash, alignDelimiter }) => (
+    [delimiterDash, alignDelimiter]
+  );
 
   render(str) {
     const rest = this.len - str.length;
@@ -62,7 +68,7 @@ class ColumnRendererCenter extends ColumnRendererDefault {
 
   render(str) {
     const rest = this.len - str.length;
-    const isEven = rest % 2;
+    const isEven = (rest % 2) * this.alignCenterLeft;
     const before = (rest - isEven) / 2;
     const after = before + isEven;
 
@@ -102,6 +108,7 @@ class ColumnKeeper {
     this.serializer = serializer || defaults.serializer;
     const Renderer = renderers[align] || rendererDefault;
     this.renderer = new Renderer(options);
+    this.renderer.setLen(2 + this.renderer.constructor.hasCentralDash);
     this.renderer.title = this.serialize(options.title);
   }
 }
@@ -205,7 +212,7 @@ import("./dist/bundle.js")
       [
         { key: "name", title: "API Name" },
         { key: "bytes", title: "Size (bytes)", align: "right" },
-        { key: "source", title: "Source Code", hide: false },
+        { key: "source", title: "Source Code", hide: process.env.SOURCE_HIDE },
       ],
     )
 

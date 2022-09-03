@@ -7,7 +7,8 @@
   "scripts": {
     "build": "webpack --progress",
     "test": "jest --coverage",
-    "sizereport": "npm run build && node calc_compiled_size.js"
+    "sizereport": "npm run build && node calc_compiled_size.js",
+    "sizereport-nosource": "npm run build && SOURCE_HIDE=1 node calc_compiled_size.js"
   },
   "repository": {
     "type": "git",
