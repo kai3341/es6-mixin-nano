@@ -94,10 +94,11 @@ class ColumnKeeper {
     return serialized
   }
 
-  constructor({ align, serializer, key, ...options }) {
+  constructor({ align, serializer, key, hide, ...options }) {
     const { defaults, renderers, rendererDefault } = this.constructor;
     this.align = align;
     this.key = key;
+    this.hide = hide;
     this.serializer = serializer || defaults.serializer;
     const Renderer = renderers[align] || rendererDefault;
     this.renderer = new Renderer(options);
@@ -167,6 +168,7 @@ class MarkdownTable {
     const result = [];
 
     for (const cfg of this.rowConfig) {
+      if (cfg.hide) continue;
       const rendered = cfg.renderer[key]();
       result.push(rendered);
     }
@@ -178,6 +180,7 @@ class MarkdownTable {
     const result = [];
 
     for (const cfg of this.rowConfig) {
+      if (cfg.hide) continue;
       const serialized = row[cfg.key];
       const rendered = cfg.renderer.render(serialized);
       result.push(rendered);
@@ -202,7 +205,7 @@ import("./dist/bundle.js")
       [
         { key: "name", title: "API Name" },
         { key: "bytes", title: "Size (bytes)", align: "right" },
-        { key: "source", title: "Source Code" },
+        { key: "source", title: "Source Code", hide: false },
       ],
     )
 
