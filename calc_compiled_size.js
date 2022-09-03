@@ -3,128 +3,187 @@ This module is a good example how to create a library while you are publishing
 your another library
 */
 
+class ColumnRendererDefault {
+  static hasCentralDash = false;
+  static defaults = {
+    alignDelimiters: true,
+    delimiterDash: "-",
+    alignDelimiter: ":",
+    space: " ",
+    len: 0,
+  };
 
-class WrapString {
-  constructor(len, align = "left") {
-    this.len = len;
-    this.align = align;
-    this.wrap = this[align];
+  static delimiters = ({ delimiterDash }) => [delimiterDash, delimiterDash];
+
+  constructor(options) {
+    const userOptions = { ...this.constructor.defaults, ...options };
+    userOptions.delimiters = this.constructor.delimiters(userOptions);
+    Object.assign(this, userOptions);
   }
 
-  wrap(str) { /* replaces by left/right/center */ }
-
-  left(str) {
-    const rest = this.len - str.length - 1;
-    const result = [" ", str, " ".repeat(rest)];
-    return result.join("");
+  render(str) {
+    const rest = this.len - str.length;
+    return str + this.space.repeat(rest);
   }
 
-  right(str) {
-    const rest = this.len - str.length - 1;
-    const result = [" ".repeat(rest), str, " "];
-    return result.join("");
+  renderDelimiter() {
+    const centralDashCount = this.alignDelimiters
+      ? this.len - 2
+      : this.constructor.hasCentralDash;
+
+    return this.delimiters[0] + this.delimiterDash.repeat(centralDashCount) + this.delimiters[1];
   }
 
-  center(str) {
+  renderTitle() {
+    return this.render(this.title);
+  }
+
+  setLen(value) {
+    this.len = Math.max(this.len, value);
+  }
+}
+
+class ColumnRendererLeft extends ColumnRendererDefault {
+  static delimiters = ({ delimiterDash, alignDelimiter }) => [alignDelimiter, delimiterDash];
+}
+
+class ColumnRendererRight extends ColumnRendererDefault {
+  static delimiters = ({ delimiterDash, alignDelimiter }) => [delimiterDash, alignDelimiter];
+
+  render(str) {
+    const rest = this.len - str.length;
+    return this.space.repeat(rest) + str;
+  }
+}
+
+class ColumnRendererCenter extends ColumnRendererDefault {
+  static hasCentralDash = true;
+  static delimiters = ({ alignDelimiter }) => [alignDelimiter, alignDelimiter];
+
+  render(str) {
     const rest = this.len - str.length;
     const isEven = rest % 2;
     const before = (rest - isEven) / 2;
     const after = before + isEven;
 
-    const result = [" ".repeat(before), str, " ".repeat(after)];
-    return result.join("");
+    return this.space.repeat(before) + str + this.space.repeat(after);
+  }
+}
+
+
+class ColumnKeeper {
+  static rendererDefault = ColumnRendererDefault;
+  static renderers = {
+    left: ColumnRendererLeft,
+    right: ColumnRendererRight,
+    center: ColumnRendererCenter,
+  };
+
+  static defaults = {
+    serializer: (value) => (
+      (value === undefined || value === null)
+        ? " "
+        : value.toString()
+    ),
+  };
+
+  serialize(value) {
+    const serialized = this.serializer(value);
+    const serializedLen = serialized.length;
+    this.renderer.setLen(serializedLen);
+    return serialized
+  }
+
+  constructor({ align, serializer, key, ...options }) {
+    const { defaults, renderers, rendererDefault } = this.constructor;
+    this.align = align;
+    this.key = key;
+    this.serializer = serializer || defaults.serializer;
+    const Renderer = renderers[align] || rendererDefault;
+    this.renderer = new Renderer(options);
+    this.serialize(options.title);
   }
 }
 
 
 class MarkdownTable {
-  constructor(/*{ key, head, len, align }, ...*/) {
-    this.report = [];
-    this.rowConfig = arguments;
+  static defaults = {
+    rowStart: '|',
+    rowEnd: '|',
+    rowJoin: '|',
+    padding: " ",
+  };
 
+  static settingsFromOptions(options) {
+    const merged = { ...this.defaults, ...options };
+    const { rowStart, rowEnd, rowJoin, padding } = merged;
+
+    return {
+      rowStart: rowStart ? rowStart + padding : "",
+      rowEnd: rowEnd ? padding + rowEnd : "",
+      rowJoin: rowJoin ? padding + rowJoin + padding : padding,
+    };
+  }
+
+  constructor(columns, options) {
+    this.settings = this.constructor.settingsFromOptions(options);
+    this.report = [];
+    this.rowConfig = [];
     this.rowConfigIndex = {};
-    for (const item of arguments) {
-      const itemLen = item.len || 0;
-      item.$wrapString = new WrapString(itemLen, item.align);
-      this.rowConfigIndex[item.key] = item;
+
+    for (const item of columns) {
+      const columnKeeper = new ColumnKeeper(item);
+      this.rowConfig.push(columnKeeper);
+      this.rowConfigIndex[item.key] = columnKeeper;
     }
   }
 
-  updateConfig(row) {
+  prepareRow(row) {
     for (const [key, value] of Object.entries(row)) {
-      const valueStr = value.toString();
-      row[key] = valueStr;
-
       const cfg = this.rowConfigIndex[key];
-
       if (!cfg) continue;
-
-      const valueLength = valueStr.length + 2;
-      cfg.$wrapString.len = Math.max(cfg.$wrapString.len, valueLength);
+      row[key] = cfg.serialize(value);
     }
   }
 
   row(row) {
-    this.updateConfig(row);
+    this.prepareRow(row);
     this.report.push(row);
   }
 
   render() {
-    const headerRow = this.headerRow();
-    this.updateConfig(headerRow);
-
     const result = this.report.map(this.renderRow);
-
-    result.unshift(this.renderDelimiter());
-    result.unshift(this.renderRow(headerRow));
+    result.unshift(this.renderRowFrom("renderDelimiter"));
+    result.unshift(this.renderRowFrom("renderTitle"));
     return result.join("\n");
   }
 
-  headerRow() {
-    const row = {};
+  renderLine(arr) {
+    const { settings } = this;
+    return settings.rowStart + arr.join(settings.rowJoin) + settings.rowEnd;
+  }
 
-    for (const { key, head } of this.rowConfig) row[key] = head;
+  renderRowFrom(key) {
+    const result = [];
 
-    return row;
+    for (const cfg of this.rowConfig) {
+      const rendered = cfg.renderer[key]();
+      result.push(rendered);
+    }
+
+    return this.renderLine(result);
   }
 
   renderRow = (row) => {
-    const result = ["|"];
+    const result = [];
 
-    for (const { key, align, $wrapString } of this.rowConfig) {
-      const value = row[key] || " ";
-      const wrapped = $wrapString.wrap(value);
-      result.push(wrapped);
-      result.push("|");
+    for (const cfg of this.rowConfig) {
+      const serialized = row[cfg.key];
+      const rendered = cfg.renderer.render(serialized);
+      result.push(rendered);
     }
 
-    return result.join("");
-  }
-
-  static renderDelimiterSettings = {
-    [undefined]: [0b00, 0],
-    left: [0b10, 1],
-    right: [0b01, 1],
-    center: [0b11, 2],
-  }
-
-  renderDelimiter() {
-    const { renderDelimiterSettings } = this.constructor;
-    const result = ["|"];
-
-    for (const { key, $wrapString, align } of this.rowConfig) {
-      const len = $wrapString.len;
-      const [alignCode, alignLength] = renderDelimiterSettings[align];
-
-      const dashCount = len - alignLength;
-
-      if (alignCode & 0b10) result.push(":");
-      result.push("-".repeat(dashCount));
-      if (alignCode & 0b01) result.push(":");
-      result.push("|");
-    }
-
-    return result.join("");
+    return this.renderLine(result);
   }
 }
 
@@ -140,9 +199,11 @@ import("./dist/bundle.js")
     delete ES6MixinNanoDesciptors["__esModule"];
 
     const mdReport = new MarkdownTable(
-      { key: "name", head: "API Name" },
-      { key: "bytes", head: "Size (bytes)", align: "right" },
-      { key: "source", head: "Source Code" },
+      [
+        { key: "name", title: "API Name" },
+        { key: "bytes", title: "Size (bytes)", align: "right" },
+        { key: "source", title: "Source Code" },
+      ],
     )
 
     for (const [name, value] of Object.entries(ES6MixinNanoDesciptors)) {
