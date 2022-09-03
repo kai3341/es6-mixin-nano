@@ -102,7 +102,7 @@ class ColumnKeeper {
     this.serializer = serializer || defaults.serializer;
     const Renderer = renderers[align] || rendererDefault;
     this.renderer = new Renderer(options);
-    this.serialize(options.title);
+    this.renderer.title = this.serialize(options.title);
   }
 }
 
@@ -181,7 +181,7 @@ class MarkdownTable {
 
     for (const cfg of this.rowConfig) {
       if (cfg.hide) continue;
-      const serialized = row[cfg.key];
+      const serialized = row[cfg.key] || "";
       const rendered = cfg.renderer.render(serialized);
       result.push(rendered);
     }
