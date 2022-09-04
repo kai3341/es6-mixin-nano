@@ -1,6 +1,6 @@
 /*
-This module is a good example how to create a library while you are publishing
-your another library
+This module is a good example how to create two new libraries while you are
+publishing your library
 */
 
 class ColumnRendererDefault {
@@ -202,27 +202,35 @@ class MarkdownTable {
 const self = {};
 global.self = self;
 
-import("./dist/bundle.js")
-  .then(bundle => {
-    const { ES6MixinNano } = self;
-    const ES6MixinNanoDesciptors = Object.getOwnPropertyDescriptors(ES6MixinNano);
-    delete ES6MixinNanoDesciptors["__esModule"];
+async function sizeReport(path, exportedName, mdReportColumns) {
+  try {
+    const bundle = await import(path);
+  } catch (e) {
+    console.error("Run `npm run build` first!", e);
+  }
 
-    const mdReport = new MarkdownTable(
-      [
-        { key: "name", title: "API Name" },
-        { key: "bytes", title: "Size (bytes)", align: "right" },
-        { key: "source", title: "Source Code", hide: process.env.SOURCE_HIDE },
-      ],
-    )
+  const targetModule = self[exportedName];
+  const targetModuleDesciptors = Object.getOwnPropertyDescriptors(targetModule);
+  delete targetModuleDesciptors["__esModule"];
 
-    for (const [name, value] of Object.entries(ES6MixinNanoDesciptors)) {
-      const compiled = value.get();
-      const source = compiled.toString();
-      const bytes = source.length;
-      mdReport.row({ name, bytes, source });
-    }
+  const mdReport = new MarkdownTable(mdReportColumns)
 
-    console.log(mdReport.render());
-  })
-  .catch((e) => console.error("Run `npm run build` first!", e))
+  for (const [name, value] of Object.entries(targetModuleDesciptors)) {
+    const compiled = value.get();
+    const source = compiled.toString();
+    const bytes = source.length;
+    mdReport.row({ name, bytes, source });
+  }
+
+  console.log(mdReport.render());
+}
+
+// -----------------------------------------------------------------------------
+
+const mdReportColumns = [
+  { key: "name", title: "API Name" },
+  { key: "bytes", title: "Size (bytes)", align: "right" },
+  { key: "source", title: "Source Code", hide: process.env.SOURCE_HIDE },
+];
+
+sizeReport("./dist/bundle.js", "ES6MixinNano", mdReportColumns);
