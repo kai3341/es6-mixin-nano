@@ -4,44 +4,54 @@ publishing your library
 */
 
 class ColumnRendererDefault {
-  static hasCentralDash = false;
   static defaults = {
     alignDelimiters: true,
     delimiterDash: "-",
     alignDelimiter: ":",
     alignCenterLeft: 1,
     space: " ",
-    len: 2,
+    len: 1,
   };
 
   static delimiters = ({ delimiterDash }) => [delimiterDash, delimiterDash];
+  static minimalDelimiter = ({ delimiterDash }) => (delimiterDash);
 
   constructor(options) {
     const userOptions = { ...this.constructor.defaults, ...options };
     userOptions.delimiters = this.constructor.delimiters(userOptions);
-    Object.assign(this, userOptions);
+    const minimalDelimiter = this.constructor.minimalDelimiter(userOptions);
+    const minLength = minimalDelimiter.length;
+    this.minimalDelimiter = minimalDelimiter;
+    this.minLength = minLength;
+    this.options = userOptions;
+    this.setLen(minLength);
   }
 
   render(str) {
-    const rest = this.len - str.length;
-    return str + this.space.repeat(rest);
+    const { len, space } = this.options;
+    const rest = len - str.length;
+    return str + space.repeat(rest);
   }
 
   renderDelimiter() {
-    const [start, end] = this.delimiters;
-    const centralDashCount = this.alignDelimiters
-      ? this.len - 2
-      : this.constructor.hasCentralDash;
+    const { options, minimalDelimiter, minLength } = this;
+    const { delimiters, alignDelimiters, delimiterDash, len } = options;
 
-    return start + this.delimiterDash.repeat(centralDashCount) + end;
+    if (!(alignDelimiters && len > minLength)) return minimalDelimiter;
+
+    const [start, end] = delimiters;
+    const centralDashCount = len - 2;
+
+    return start + delimiterDash.repeat(centralDashCount) + end;
   }
 
   renderTitle() {
-    return this.render(this.title);
+    return this.render(this.options.title);
   }
 
   setLen(value) {
-    this.len = Math.max(this.len, value);
+    const { options } = this;
+    options.len = Math.max(options.len, value);
   }
 }
 
@@ -49,6 +59,8 @@ class ColumnRendererLeft extends ColumnRendererDefault {
   static delimiters = ({ delimiterDash, alignDelimiter }) => (
     [alignDelimiter, delimiterDash]
   );
+
+  static minimalDelimiter = ({ delimiters }) => (delimiters.join(""));
 }
 
 class ColumnRendererRight extends ColumnRendererDefault {
@@ -56,23 +68,29 @@ class ColumnRendererRight extends ColumnRendererDefault {
     [delimiterDash, alignDelimiter]
   );
 
+  static minimalDelimiter = ({ delimiters }) => (delimiters.join(""));
+
   render(str) {
-    const rest = this.len - str.length;
-    return this.space.repeat(rest) + str;
+    const { len, space } = this.options;
+    const rest = len - str.length;
+    return space.repeat(rest) + str;
   }
 }
 
 class ColumnRendererCenter extends ColumnRendererDefault {
-  static hasCentralDash = true;
   static delimiters = ({ alignDelimiter }) => [alignDelimiter, alignDelimiter];
+  static minimalDelimiter = ({ delimiters, delimiterDash }) => (
+    delimiters.join(delimiterDash)
+  );
 
   render(str) {
-    const rest = this.len - str.length;
-    const isEven = (rest % 2) * this.alignCenterLeft;
+    const { len, space, alignCenterLeft } = this.options;
+    const rest = len - str.length;
+    const isEven = (rest % 2) * alignCenterLeft;
     const before = (rest - isEven) / 2;
     const after = before + isEven;
 
-    return this.space.repeat(before) + str + this.space.repeat(after);
+    return space.repeat(before) + str + space.repeat(after);
   }
 }
 
@@ -88,7 +106,7 @@ class ColumnKeeper {
   static defaults = {
     serializer: (value) => (
       (value === undefined || value === null)
-        ? " "
+        ? ""
         : value.toString()
     ),
   };
@@ -108,8 +126,7 @@ class ColumnKeeper {
     this.serializer = serializer || defaults.serializer;
     const Renderer = renderers[align] || rendererDefault;
     this.renderer = new Renderer(options);
-    this.renderer.setLen(2 + this.renderer.constructor.hasCentralDash);
-    this.renderer.title = this.serialize(options.title);
+    this.renderer.options.title = this.serialize(options.title);
   }
 }
 
@@ -136,20 +153,13 @@ class MarkdownTable {
   constructor(columns, options) {
     this.settings = this.constructor.settingsFromOptions(options);
     this.report = [];
-    this.rowConfig = [];
-    this.rowConfigIndex = {};
-
-    for (const item of columns) {
-      const columnKeeper = new ColumnKeeper(item);
-      this.rowConfig.push(columnKeeper);
-      this.rowConfigIndex[item.key] = columnKeeper;
-    }
+    this.rowConfig = columns.map(item => new ColumnKeeper(item));
   }
 
   prepareRow(row) {
-    for (const [key, value] of Object.entries(row)) {
-      const cfg = this.rowConfigIndex[key];
-      if (!cfg) continue;
+    for (const cfg of this.rowConfig) {
+      const { key } = cfg;
+      const value = row[key];
       row[key] = cfg.serialize(value);
     }
   }
