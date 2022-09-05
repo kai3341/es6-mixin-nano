@@ -8,7 +8,7 @@ class ColumnRendererDefault {
     alignDelimiters: true,
     delimiterDash: "-",
     alignDelimiter: ":",
-    alignCenterLeft: 1,
+    alignCenterPreferLeft: 1,
     space: " ",
     len: 1,
   };
@@ -55,20 +55,20 @@ class ColumnRendererDefault {
   }
 }
 
-class ColumnRendererLeft extends ColumnRendererDefault {
-  static delimiters = ({ delimiterDash, alignDelimiter }) => (
-    [alignDelimiter, delimiterDash]
-  );
-
+class _ColumnRendererLeftRight extends ColumnRendererDefault {
   static minimalDelimiter = ({ delimiters }) => (delimiters.join(""));
 }
 
-class ColumnRendererRight extends ColumnRendererDefault {
+class ColumnRendererLeft extends _ColumnRendererLeftRight {
+  static delimiters = ({ delimiterDash, alignDelimiter }) => (
+    [alignDelimiter, delimiterDash]
+  );
+}
+
+class ColumnRendererRight extends _ColumnRendererLeftRight {
   static delimiters = ({ delimiterDash, alignDelimiter }) => (
     [delimiterDash, alignDelimiter]
   );
-
-  static minimalDelimiter = ({ delimiters }) => (delimiters.join(""));
 
   render(str) {
     const { len, space } = this.options;
@@ -84,9 +84,9 @@ class ColumnRendererCenter extends ColumnRendererDefault {
   );
 
   render(str) {
-    const { len, space, alignCenterLeft } = this.options;
+    const { len, space, alignCenterPreferLeft } = this.options;
     const rest = len - str.length;
-    const isEven = (rest % 2) * alignCenterLeft;
+    const isEven = (rest % 2) * alignCenterPreferLeft;
     const before = (rest - isEven) / 2;
     const after = before + isEven;
 
@@ -150,10 +150,12 @@ class MarkdownTable {
     };
   }
 
-  constructor(columns, options) {
-    this.settings = this.constructor.settingsFromOptions(options);
+  constructor({ columns, columnMutual, reportOptions }) {
+    this.settings = this.constructor.settingsFromOptions(reportOptions);
     this.report = [];
-    this.rowConfig = columns.map(item => new ColumnKeeper(item));
+    this.rowConfig = columns.map(
+      item => new ColumnKeeper({ ...columnMutual, ...item })
+    );
   }
 
   prepareRow(row) {
@@ -212,7 +214,7 @@ class MarkdownTable {
 const self = {};
 global.self = self;
 
-async function sizeReport(path, exportedName, mdReportColumns) {
+async function sizeReport(path, exportedName, mdReportSettings) {
   try {
     const bundle = await import(path);
   } catch (e) {
@@ -223,7 +225,7 @@ async function sizeReport(path, exportedName, mdReportColumns) {
   const targetModuleDesciptors = Object.getOwnPropertyDescriptors(targetModule);
   delete targetModuleDesciptors["__esModule"];
 
-  const mdReport = new MarkdownTable(mdReportColumns)
+  const mdReport = new MarkdownTable(mdReportSettings);
 
   for (const [name, value] of Object.entries(targetModuleDesciptors)) {
     const compiled = value.get();
@@ -237,10 +239,15 @@ async function sizeReport(path, exportedName, mdReportColumns) {
 
 // -----------------------------------------------------------------------------
 
-const mdReportColumns = [
-  { key: "name", title: "API Name" },
-  { key: "bytes", title: "Size (bytes)", align: "right" },
-  { key: "source", title: "Source Code", hide: process.env.SOURCE_HIDE },
-];
+const mdReportSettings = {
+  columns: [
+    { key: "name", title: "API Name" },
+    { key: "bytes", title: "Size (bytes)", align: "right" },
+    { key: "source", title: "Source Code", hide: process.env.SOURCE_HIDE },
+  ],
+  columnMutual: {
+    delimiterDash: "=",
+  },
+};
 
-sizeReport("./dist/bundle.js", "ES6MixinNano", mdReportColumns);
+sizeReport("./dist/bundle.js", "ES6MixinNano", mdReportSettings);
