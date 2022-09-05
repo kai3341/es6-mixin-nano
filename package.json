@@ -1,6 +1,6 @@
 {
   "name": "es6-mixin-nano",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ES6 Mixin support",
   "main": "src/index.js",
   "type": "module",
