@@ -2,6 +2,10 @@
 
 ES6 Mixin / polyfill tool
 
+![minzip](https://badgen.net/bundlephobia/minzip/es6-mixin-nano)
+[![codecov](https://codecov.io/gh/kai3341/es6-mixin-nano/branch/main/graph/badge.svg?token=44TKZGZNEX)](https://codecov.io/gh/kai3341/es6-mixin-nano)
+![license](https://badgen.net/npm/license/es6-mixin-nano)
+
 As minimal as possible modular class mixin / polyfill utility. Size report is at
 the bottom of this document at the [reports](#reports) section, just roll down
 
